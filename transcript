@@ -1,0 +1,55 @@
+# Reading C:/altera/15.0/modelsim_ase/tcl/vsim/pref.tcl
+# vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache2814912710816016722/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
+# Start time: 15:22:13 on Nov 09,2015
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading ieee.std_logic_arith(body)
+# Loading ieee.std_logic_unsigned(body)
+# Loading work.logpack(body)
+# Loading work.tb_directory(behavior)
+# Loading work.llc_memory(rtl)
+# Loading work.directory_manager(rtl)
+# ** Warning: (vsim-8683) Uninitialized out port /tb_directory/uut_directory/RouterDataOut(11 downto 0) has no driver.
+# 
+# This port will contribute value (UUUUUUUUUUUU) to the signal network.
+# 
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+# 
+#           File in use by: Mirko  Hostname: ADMIN-PC1  ProcessID: 5756
+# 
+#           Attempting to use alternate WLF file "./wlftqbbjt0".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+# 
+#           Using alternate file: ./wlftqbbjt0
+# 
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 36
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 37
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 38
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 39
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 40
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 41
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 42
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 43
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 44
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 45
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 46
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 47
+# ** Error: unknown option "wave"
+# Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 48
+run
+# End time: 15:23:45 on Nov 09,2015, Elapsed time: 0:01:32
+# Errors: 39, Warnings: 3
