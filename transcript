@@ -1,6 +1,6 @@
 # Reading C:/altera/15.0/modelsim_ase/tcl/vsim/pref.tcl
 # vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache2814912710816016722/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
-# Start time: 15:22:13 on Nov 09,2015
+# Start time: 17:14:17 on Nov 09,2015
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -19,10 +19,10 @@
 # 
 #           File in use by: Mirko  Hostname: ADMIN-PC1  ProcessID: 5756
 # 
-#           Attempting to use alternate WLF file "./wlftqbbjt0".
+#           Attempting to use alternate WLF file "./wlftc1evg4".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
 # 
-#           Using alternate file: ./wlftqbbjt0
+#           Using alternate file: ./wlftc1evg4
 # 
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 36
@@ -51,5 +51,11 @@
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 48
 run
-# End time: 15:23:45 on Nov 09,2015, Elapsed time: 0:01:32
-# Errors: 39, Warnings: 3
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_directory
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_directory
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_directory
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_directory

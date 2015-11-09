@@ -108,17 +108,15 @@ BEGIN
 		)
 		port map(
 			clk   => clk,
-			raddr => raddr,
-			waddr => waddr,
-			data  => data,
-			we    => we,
+			raddr => raddr_temp,
+			waddr => waddr_temp,
+			data  => MemDataOut,
+			we    => MemWriteEn,
 			q     => MemDataIn
 		);
-
-	we    <= we_temp when enable = '0' else MemWriteEn;
-	raddr <= raddr_temp when enable = '0' else CONV_INTEGER(MemReadAddr);
-	waddr <= waddr_temp when enable = '0' else CONV_INTEGER(MemWriteAddr);
-	data  <= data_temp when enable = '0' else MemDataOut;
+		
+	raddr_temp <= CONV_INTEGER(MemReadAddr);
+	waddr_temp <= CONV_INTEGER(MemWriteAddr);
 
 	uut_directory : directory_manager
 		generic map(
@@ -167,32 +165,59 @@ BEGIN
 		reset <= '1';
 
 		wait for 100 ns;
+		enable <= '1';
 		reset      <= '0';
-		we_temp    <= '1';
-		waddr_temp <= 0;
-		data_temp  <= x"01";
-
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
+		CCAddrIn   <= x"00";
+		CCDataIn <= x"11";
+		
 		wait for clk_period;
-		waddr_temp <= 1;
-		data_temp  <= x"02";
-
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
+		wait for clk_period * 10;
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
+		CCAddrIn   <= x"01";
+		CCDataIn <= x"22";
+		
 		wait for clk_period;
-		waddr_temp <= 2;
-		data_temp  <= x"03";
-
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
+		wait for clk_period * 10;
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
+		CCAddrIn   <= x"02";
+		CCDataIn <= x"33";
+		
 		wait for clk_period;
-		waddr_temp <= 3;
-		data_temp  <= x"04";
-
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
+		wait for clk_period * 10;
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
+		CCAddrIn   <= x"03";
+		CCDataIn <= x"44";
+		
 		wait for clk_period;
-		waddr_temp <= 4;
-		data_temp  <= x"05";
-
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
+		wait for clk_period * 10;
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
+		CCAddrIn   <= x"04";
+		CCDataIn <= x"55";
+		
 		wait for clk_period;
-		we <= '0';
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
 
 		wait for clk_period * 10;
-		enable     <= '1';
 		CCValidIn  <= '1';
 		CCGetPutIn <= '0';
 		CCAddrIn   <= x"00";
@@ -215,7 +240,7 @@ BEGIN
 
 		wait for clk_period;
 		CCValidIn <= '0';
-
+		
 		wait;
 
 	end process;
