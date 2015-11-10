@@ -10,8 +10,8 @@ entity directory_manager is
 	Generic(
 		DIRECTORY_ID   : natural := 0;  -- This Directory identifier
 		DIRECTORIES_N  : natural := 4;  -- Directories number
-		DATA_WIDTH     : natural := 32; -- Data width
-		BLOCK_WIDTH    : natural := 16; -- Memory address width
+		DATA_WIDTH     : natural := 8;  -- Data width
+		BLOCK_WIDTH    : natural := 8;  -- Memory address width
 		-- Message to/from core width -> memory address width + 1 bit for discern if it is a load or a store request 
 		--ROUTER_MEX_WIDTH : natural := 12;
 
@@ -95,7 +95,7 @@ architecture RTL of directory_manager is
 	--signal fifo_full, fifo_empty : std_logic                                             := '0';
 
 	-- FSM and temporany signals 
-	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, wait_remote_getS, wait_remote_getM, memory_delay, set_sharer);
+	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, wait_remote_getS, wait_remote_getM, memory_delay, set_sharer);
 	signal current_s, next_s : state_type := idle;
 
 	-- Router interface temporany signals
@@ -160,16 +160,21 @@ begin
 							end if;
 						else            -- STORE REQUEST, a store request can be satisfied if the block is in Modified state
 							mem_write_addr_temp <= CCAddrIn;
-							if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).state = MODIFIED_STATE then -- If is already in Modified state
-								-- Ack to Cache Controller
-								cc_valid_out_temp <= '1';
-								cc_ack_out_temp   <= '1';
-								-- Write in Memory
-								mem_we_temp       <= '1';
-								current_s         <= idle;
-							else        -- else we need to get the Modified state for this block
-								current_s    <= getM;
-								requestor_id <= DIRECTORY_ID;
+							-- If this condition is true the current node is the home 
+							if CCAddrIn(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N)) = CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) then
+								if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).state = MODIFIED_STATE then -- If is already in Modified state
+									-- Ack to Cache Controller
+									cc_valid_out_temp <= '1';
+									cc_ack_out_temp   <= '1';
+									-- Write in Memory
+									mem_we_temp       <= '1';
+									current_s         <= idle;
+								else    -- else we need to get the Modified state for this block
+									current_s    <= getM;
+									requestor_id <= DIRECTORY_ID;
+								end if;
+							else
+								current_s <= Fwd_PutM; -- If the current node isn't the home 
 							end if;
 						end if;
 					elsif RouterValidIn = '1' then -- A request from the router
@@ -269,6 +274,9 @@ begin
 						home_node <= mem_read_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N));
 						current_s <= wait_remote_getM;
 					end if;
+					
+				when Fwd_PutM =>	
+					current_s <= idle;
 
 				when memory_delay =>
 					current_s <= next_s;

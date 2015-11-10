@@ -179,6 +179,16 @@ BEGIN
 		wait for clk_period * 10;
 		CCValidIn  <= '1';
 		CCGetPutIn <= '1';
+		CCAddrIn   <= x"F1";
+		CCDataIn <= x"22";
+		
+		wait for clk_period;
+		CCValidIn <= '0';
+		CCGetPutIn <= '0';
+		
+		wait for clk_period * 10;
+		CCValidIn  <= '1';
+		CCGetPutIn <= '1';
 		CCAddrIn   <= x"01";
 		CCDataIn <= x"22";
 		

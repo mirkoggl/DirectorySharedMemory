@@ -1,6 +1,6 @@
 # Reading C:/altera/15.0/modelsim_ase/tcl/vsim/pref.tcl
-# vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache2814912710816016722/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
-# Start time: 17:14:17 on Nov 09,2015
+# vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache9111481322865924780/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
+# Start time: 21:21:45 on Nov 10,2015
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -11,18 +11,14 @@
 # Loading work.tb_directory(behavior)
 # Loading work.llc_memory(rtl)
 # Loading work.directory_manager(rtl)
-# ** Warning: (vsim-8683) Uninitialized out port /tb_directory/uut_directory/RouterDataOut(11 downto 0) has no driver.
-# 
-# This port will contribute value (UUUUUUUUUUUU) to the signal network.
-# 
 # ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
 # 
 #           File in use by: Mirko  Hostname: ADMIN-PC1  ProcessID: 5756
 # 
-#           Attempting to use alternate WLF file "./wlftc1evg4".
+#           Attempting to use alternate WLF file "./wlftx28941".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
 # 
-#           Using alternate file: ./wlftc1evg4
+#           Using alternate file: ./wlftx28941
 # 
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 36
@@ -59,3 +55,6 @@ run
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
 # ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
+run
+# End time: 21:26:35 on Nov 10,2015, Elapsed time: 0:04:50
+# Errors: 39, Warnings: 6
