@@ -62,14 +62,14 @@ architecture RTL of directory_manager is
 	constant FWD_GET_M : std_logic_vector(1 downto 0) := "00";
 	constant FWD_GET_S : std_logic_vector(1 downto 0) := "01";
 	constant FWD_PUT_M : std_logic_vector(1 downto 0) := "10";
-	
+
 	-- MESI State value constant 
 	constant INVALID_STATE   : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "00";
 	constant MODIFIED_STATE  : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "01";
 	constant SHARED_STATE    : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "10";
 	constant EXCLUSIVE_STATE : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "11";
-	
-	constant NO_DATA : std_logic_vector(DATA_WIDTH -1 downto 0) := (others => '0');
+
+	constant NO_DATA : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
 
 	--States: 
 	--       00 -> Invalid
@@ -98,7 +98,7 @@ architecture RTL of directory_manager is
 	--signal fifo_full, fifo_empty : std_logic                                             := '0';
 
 	-- FSM and temporany signals 
-	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, wait_remote_getS, wait_Fwd_PutM, wait_remote_getM, memory_delay, set_sharer);
+	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, Fwd_GetM, wait_remote_getS, wait_Fwd_PutM, wait_remote_getM, memory_delay, set_sharer);
 	signal current_s, next_s : state_type := idle;
 
 	-- Router interface temporany signals
@@ -171,12 +171,16 @@ begin
 							-- If this condition is true the current node is the home 
 							if CCAddrIn(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N)) = CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) then
 								if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).state = MODIFIED_STATE then -- If is already in Modified state
-									-- Ack to Cache Controller
-									cc_valid_out_temp <= '1';
-									cc_ack_out_temp   <= '1';
-									-- Write in Memory
-									mem_we_temp       <= '1';
-									current_s         <= idle;
+									if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).owner = CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) then -- The current node is the owner
+										-- Ack to Cache Controller
+										cc_valid_out_temp <= '1';
+										cc_ack_out_temp   <= '1';
+										-- Write in Memory
+										mem_we_temp       <= '1';
+										current_s         <= idle;
+									else	-- Forward to the Owner
+									current_s <= Fwd_GetM;
+									end if;
 								else    -- else we need to get the Modified state for this block
 									current_s    <= getM;
 									requestor_id <= DIRECTORY_ID;
@@ -298,6 +302,9 @@ begin
 					home_node       <= mem_write_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N));
 					current_s       <= wait_Fwd_PutM;
 
+				when Fwd_GetM =>
+					current_s <= idle;
+				
 				when wait_Fwd_PutM =>
 					current_s <= idle;
 

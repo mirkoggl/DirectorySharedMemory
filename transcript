@@ -1,6 +1,6 @@
 # Reading C:/altera/15.0/modelsim_ase/tcl/vsim/pref.tcl
 # vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache9111481322865924780/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
-# Start time: 22:48:02 on Nov 10,2015
+# Start time: 23:24:25 on Nov 10,2015
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -15,10 +15,10 @@
 # 
 #           File in use by: Mirko  Hostname: ADMIN-PC1  ProcessID: 5756
 # 
-#           Attempting to use alternate WLF file "./wlfthcqc20".
+#           Attempting to use alternate WLF file "./wlft0jdjee".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
 # 
-#           Using alternate file: ./wlfthcqc20
+#           Using alternate file: ./wlft0jdjee
 # 
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 36
@@ -46,6 +46,23 @@
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 47
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 48
+# **** Error: LoadCompleteQ cmd: QObjects::LoadCompleted .main_pane.objects sim
+# ****        Bad sequence in.main_pane.objects.interior.cs.body.tree.lwchildsite.clipper.canvas.sfchildsite.tree, aborting query. (1)
+# Bad sequence in.main_pane.objects.interior.cs.body.tree.lwchildsite.clipper.canvas.sfchildsite.tree, aborting query. (1)
+#     while executing
+# "$itk_component(tree) insertquery end """
+#     (object "::.main_pane.objects.interior.cs.body.tree" method "::vsimwidgets::Hierarchy::requery" body line 3)
+#     invoked from within
+# "$winName requery"
+#     (procedure "ObjectsTreeView::setSignalsShowArraySize" line 7)
+#     invoked from within
+# "ObjectsTreeView::setSignalsShowArraySize $tree"
+#     (procedure "QObjects::LoadCompleted" line 5)
+#     invoked from within
+# "QObjects::LoadCompleted .main_pane.objects sim"
+#     ("eval" body line 1)
+#     invoked from within
+# "eval $p $tankNamespace "
 run
 # ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
@@ -55,5 +72,5 @@ run
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
 # ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
-# End time: 22:50:17 on Nov 10,2015, Elapsed time: 0:02:15
-# Errors: 39, Warnings: 6
+# End time: 23:42:17 on Nov 10,2015, Elapsed time: 0:17:52
+# Errors: 40, Warnings: 6
