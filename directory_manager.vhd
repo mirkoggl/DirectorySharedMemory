@@ -34,9 +34,9 @@ entity directory_manager is
 
 		-- Router Interface
 		RouterValidIn  : in  std_logic;
-		RouterDataIn   : in  std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0); -- 2 are the possible message type (Fwd-Get-M and Fwd-Get-S)
+		RouterDataIn   : in  std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0); -- 2 are the possible message type (Fwd-Get-M and Fwd-Get-S)
 		RouterValidOut : out std_logic;
-		RouterDataOut  : out std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0);
+		RouterDataOut  : out std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0);
 
 		-- Memory interface
 		MemDataIn      : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
@@ -61,12 +61,15 @@ architecture RTL of directory_manager is
 	-- Router/Controller message constants
 	constant FWD_GET_M : std_logic_vector(1 downto 0) := "00";
 	constant FWD_GET_S : std_logic_vector(1 downto 0) := "01";
-
+	constant FWD_PUT_M : std_logic_vector(1 downto 0) := "10";
+	
 	-- MESI State value constant 
 	constant INVALID_STATE   : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "00";
 	constant MODIFIED_STATE  : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "01";
 	constant SHARED_STATE    : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "10";
 	constant EXCLUSIVE_STATE : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "11";
+	
+	constant NO_DATA : std_logic_vector(DATA_WIDTH -1 downto 0) := (others => '0');
 
 	--States: 
 	--       00 -> Invalid
@@ -95,14 +98,14 @@ architecture RTL of directory_manager is
 	--signal fifo_full, fifo_empty : std_logic                                             := '0';
 
 	-- FSM and temporany signals 
-	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, wait_remote_getS, wait_remote_getM, memory_delay, set_sharer);
+	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, wait_remote_getS, wait_Fwd_PutM, wait_remote_getM, memory_delay, set_sharer);
 	signal current_s, next_s : state_type := idle;
 
 	-- Router interface temporany signals
-	signal router_data_temp : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0) := (others => '0');
-	signal router_valid_out : std_logic                                                              := '0';
-	signal router_data_out  : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0) := (others => '0');
-	signal home_node        : std_logic_vector(f_log2(DIRECTORIES_N) - 1 downto 0)                   := (others => '0');
+	signal router_data_temp : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0) := (others => '0');
+	signal router_valid_out : std_logic                                                                           := '0';
+	signal router_data_out  : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0) := (others => '0');
+	signal home_node        : std_logic_vector(f_log2(DIRECTORIES_N) - 1 downto 0)                                := (others => '0');
 
 	signal requestor_id : natural := 0;
 
@@ -151,12 +154,17 @@ begin
 						mem_data_out_temp <= CCDataIn;
 						if CCGetPutIn = GET_BLOCK then -- LOAD REQUEST, a load request can be satified if the block is in Shared state
 							mem_read_addr_temp <= CCAddrIn;
-							if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).state = SHARED_STATE then -- If the block is already in Shared state and it can be load
-								current_s <= memory_delay; -- Wait 1 clock cycle for memory response
-								next_s    <= load_mem;
-							else        -- else we need to get the Shared state for this block
-								current_s    <= getS;
-								requestor_id <= DIRECTORY_ID;
+							-- If this condition is true the current node is the home 
+							if CCAddrIn(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N)) = CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) then
+								if directory(CONV_INTEGER(CCAddrIn(ADDR_WIDTH - 1 downto 0))).state = SHARED_STATE then -- If the block is already in Shared state and it can be load
+									current_s <= memory_delay; -- Wait 1 clock cycle for memory response
+									next_s    <= load_mem;
+								else    -- else we need to get the Shared state for this block
+									current_s    <= getS;
+									requestor_id <= DIRECTORY_ID;
+								end if;
+							else
+								current_s <= Fwd_GetS;
 							end if;
 						else            -- STORE REQUEST, a store request can be satisfied if the block is in Modified state
 							mem_write_addr_temp <= CCAddrIn;
@@ -228,7 +236,13 @@ begin
 					end if;
 
 				when Fwd_GetS =>
-					current_s <= idle;
+					-- Send mex to the home node
+					router_valid_out <= '1';
+
+					-- Create the message body: Message type + Source + Dest + Block Address Request + Data
+					router_data_out <= FWD_GET_S & CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) & mem_read_addr_temp & NO_DATA;
+					home_node       <= mem_read_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N));
+					current_s       <= wait_remote_getS;
 
 				when wait_remote_getS =>
 					-- if RouterValidIn = '1' and RouterDataIn(MEM_ADDR_WIDTH + 2 - 1 downto MEM_ADDR_WIDTH + 2 - f_log2(DIRECTORIES_N)) = home_node then
@@ -274,8 +288,17 @@ begin
 						home_node <= mem_read_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N));
 						current_s <= wait_remote_getM;
 					end if;
-					
-				when Fwd_PutM =>	
+
+				when Fwd_PutM =>
+					-- Send mex to the home node
+					router_valid_out <= '1';
+
+					-- Create the message body: Message type + Source + Dest + Block Address Request + Data
+					router_data_out <= FWD_PUT_M & CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) & mem_write_addr_temp & mem_data_out_temp;
+					home_node       <= mem_write_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N));
+					current_s       <= wait_Fwd_PutM;
+
+				when wait_Fwd_PutM =>
 					current_s <= idle;
 
 				when memory_delay =>

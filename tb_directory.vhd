@@ -45,9 +45,9 @@ ARCHITECTURE behavior OF tb_directory IS
 
 			-- Router Interface
 			RouterValidIn  : in  std_logic;
-			RouterDataIn   : in  std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0); -- 2 are the possible message type (Fwd-Get-M and Fwd-Get-S)
+			RouterDataIn   : in  std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0); -- 2 are the possible message type (Fwd-Get-M and Fwd-Get-S)
 			RouterValidOut : out std_logic;
-			RouterDataOut  : out std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0);
+			RouterDataOut  : out std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0);
 
 			-- Memory interface
 			MemDataIn      : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
@@ -86,9 +86,9 @@ ARCHITECTURE behavior OF tb_directory IS
 	signal CCAddrOut      : std_logic_vector(BLOCK_WIDTH - 1 downto 0)                             := (others => '0');
 	signal CCDataOut      : std_logic_vector(DATA_WIDTH - 1 downto 0)                              := (others => '0');
 	signal RouterValidIn  : std_logic                                                              := '0';
-	signal RouterDataIn   : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0) := (others => '0');
+	signal RouterDataIn   : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH+ 2 - 1 downto 0) := (others => '0');
 	signal RouterValidOut : std_logic                                                              := '0';
-	signal RouterDataOut  : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + 2 - 1 downto 0) := (others => '0');
+	signal RouterDataOut  : std_logic_vector(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto 0) := (others => '0');
 	signal MemDataIn      : std_logic_vector(DATA_WIDTH - 1 downto 0)                              := (others => '0');
 	signal MemReadAddr    : std_logic_vector(ADDR_WIDTH - 1 downto 0)                             := (others => '0');
 	signal MemWriteEn     : std_logic                                                              := '0';
