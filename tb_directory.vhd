@@ -95,6 +95,8 @@ ARCHITECTURE behavior OF tb_directory IS
 	signal MemWriteAddr   : std_logic_vector(ADDR_WIDTH - 1 downto 0)                             := (others => '0');
 	signal MemDataOut     : std_logic_vector(DATA_WIDTH - 1 downto 0)                              := (others => '0');
 
+	constant FWD_PUT_M : std_logic_vector(1 downto 0) := "10";
+
 	-- Clock period definitions
 	constant clk_period : time := 10 ns;
 
@@ -226,6 +228,12 @@ BEGIN
 		CCValidIn <= '0';
 		CCGetPutIn <= '0';
 		
+		wait for clk_period * 10;
+		RouterValidIn  <= '1';
+		RouterDataIn <= FWD_PUT_M & "10" & x"06" & x"77";
+		
+		wait for clk_period;
+		RouterValidIn <= '0';		
 
 		wait for clk_period * 10;
 		CCValidIn  <= '1';

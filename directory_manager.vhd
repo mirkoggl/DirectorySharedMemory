@@ -62,6 +62,7 @@ architecture RTL of directory_manager is
 	constant FWD_GET_M : std_logic_vector(1 downto 0) := "00";
 	constant FWD_GET_S : std_logic_vector(1 downto 0) := "01";
 	constant FWD_PUT_M : std_logic_vector(1 downto 0) := "10";
+	constant PUT_M_ACK : std_logic_vector(1 downto 0) := "11";
 
 	-- MESI State value constant 
 	constant INVALID_STATE   : std_logic_vector(STATE_BIT_WIDTH - 1 downto 0) := "00";
@@ -81,7 +82,9 @@ architecture RTL of directory_manager is
 		owner  : std_logic_vector(OWNER_WIDTH - 1 downto 0);
 		sharer : std_logic_vector(SHARER_LIST_WIDTH - 1 downto 0);
 	end record;
+
 	type directory_t is array ((2 ** ADDR_WIDTH) - 1 downto 0) of directory_entry;
+
 	constant DIRECTORY_ENTRY_INIT : directory_entry := (
 		state  => (others => '0'),
 		owner  => (others => '0'),
@@ -98,7 +101,7 @@ architecture RTL of directory_manager is
 	--signal fifo_full, fifo_empty : std_logic                                             := '0';
 
 	-- FSM and temporany signals 
-	type state_type is (idle, others_req, load_mem, getS, getM, Fwd_GetS, Fwd_PutM, Fwd_GetM, wait_remote_getS, wait_Fwd_PutM, wait_remote_getM, memory_delay, set_sharer);
+	type state_type is (idle, others_req, load_mem, getS, getM, putM, Fwd_GetS, Fwd_PutM, Fwd_GetM, wait_remote_getS, wait_Fwd_PutM, wait_remote_getM, memory_delay, set_sharer);
 	signal current_s, next_s : state_type := idle;
 
 	-- Router interface temporany signals
@@ -178,11 +181,11 @@ begin
 										-- Write in Memory
 										mem_we_temp       <= '1';
 										current_s         <= idle;
-									else	-- Forward to the Owner
-									current_s <= Fwd_GetM;
+									else -- Forward to the Owner
+										current_s <= Fwd_GetM;
 									end if;
 								else    -- else we need to get the Modified state for this block
-									current_s    <= getM;
+									current_s    <= putM;
 									requestor_id <= DIRECTORY_ID;
 								end if;
 							else
@@ -204,7 +207,17 @@ begin
 					current_s         <= idle;
 
 				when others_req =>
-					-- A request from an extern node
+					-- A request from an extern node, read the message 
+					if router_data_temp(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH + 2 - 1 downto f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH) = FWD_PUT_M then
+						current_s           <= putM;
+						requestor_id        <= CONV_INTEGER(router_data_temp(f_log2(DIRECTORIES_N) + BLOCK_WIDTH + DATA_WIDTH - 1 downto BLOCK_WIDTH + DATA_WIDTH));
+						mem_write_addr_temp <= router_data_temp(BLOCK_WIDTH + DATA_WIDTH - 1 downto DATA_WIDTH);
+						mem_data_out_temp <= router_data_temp(DATA_WIDTH - 1 downto 0);
+					else
+						current_s <= idle;
+					end if;
+
+				when getM =>
 					current_s <= idle;
 
 				when getS =>
@@ -260,7 +273,7 @@ begin
 				when wait_remote_getM =>
 					current_s <= idle;
 
-				when getM =>
+				when putM =>
 					-- We need to find the  home node for this block
 					if mem_write_addr_temp(BLOCK_WIDTH - 1 downto BLOCK_WIDTH - f_log2(DIRECTORIES_N)) = CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) then -- If this condition is true the current node is the home 
 						if directory(CONV_INTEGER(mem_write_addr_temp(ADDR_WIDTH - 1 downto 0))).state = INVALID_STATE then -- If block is invalid and current node is the home
@@ -269,12 +282,18 @@ begin
 							directory(CONV_INTEGER(mem_write_addr_temp(ADDR_WIDTH - 1 downto 0))).sharer <= (others => '0'); -- Sharer should be already 0
 							directory(CONV_INTEGER(mem_write_addr_temp(ADDR_WIDTH - 1 downto 0))).owner  <= CONV_STD_LOGIC_VECTOR(requestor_id, OWNER_WIDTH); -- Save the Owner
 
-							-- Ack to Cache Controller
-							cc_valid_out_temp <= '1';
-							cc_ack_out_temp   <= '1';
+							-- Ack to requestor
+							if requestor_id = DIRECTORY_ID then -- If requestor is the Cache Controller
+								cc_valid_out_temp <= '1';
+								cc_ack_out_temp   <= '1';
+							else        -- Else send an Ack to the requestor node
+								router_valid_out <= '1';
+								-- Create the message body: Message type + Source + Dest + Block Address Request + Data
+								router_data_out <= PUT_M_ACK & CONV_STD_LOGIC_VECTOR(DIRECTORY_ID, f_log2(DIRECTORIES_N)) & mem_write_addr_temp & NO_DATA;
+							end if;
 							-- Write in Memory
-							mem_we_temp       <= '1';
-							current_s         <= idle;
+							mem_we_temp <= '1';
+							current_s   <= idle;
 						elsif directory(CONV_INTEGER(mem_read_addr_temp(ADDR_WIDTH - 1 downto 0))).state = SHARED_STATE then -- If block is shared and current node is the home
 							-- TODO: Invalid all shared copy and send AckCount to the requestor
 							-- TODO: Send can be with multicast
@@ -304,7 +323,7 @@ begin
 
 				when Fwd_GetM =>
 					current_s <= idle;
-				
+
 				when wait_Fwd_PutM =>
 					current_s <= idle;
 

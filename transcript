@@ -1,6 +1,6 @@
 # Reading C:/altera/15.0/modelsim_ase/tcl/vsim/pref.tcl
-# vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache9111481322865924780/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
-# Start time: 23:24:25 on Nov 10,2015
+# vsim -gui -modelsimini C:/Users/Mirko/AppData/Local/Temp/SigasiCompileCache1034644483503348766/DirectorySharedMemory/mentor/modelsim.ini work.tb_directory(behavior) 
+# Start time: 02:03:01 on Nov 11,2015
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -15,10 +15,10 @@
 # 
 #           File in use by: Mirko  Hostname: ADMIN-PC1  ProcessID: 5756
 # 
-#           Attempting to use alternate WLF file "./wlft0jdjee".
+#           Attempting to use alternate WLF file "./wlft2kvh7q".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
 # 
-#           Using alternate file: ./wlft0jdjee
+#           Using alternate file: ./wlft2kvh7q
 # 
 # ** Error: unknown option "wave"
 # Executing ONERROR command at macro C:\Users\Mirko\workspaceSigasi\DirectorySharedMemory\wave_llc_directory.do line 36
@@ -72,5 +72,5 @@ run
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
 # ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
 #    Time: 0 ps  Iteration: 0  Instance: /tb_directory
-# End time: 23:42:17 on Nov 10,2015, Elapsed time: 0:17:52
+# End time: 02:04:04 on Nov 11,2015, Elapsed time: 0:01:03
 # Errors: 40, Warnings: 6
